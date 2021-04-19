@@ -5,36 +5,6 @@ from random import randint
 
 global env
 
-def parse_args():
-    """Parse command line arguments"""
-
-    parser = argparse.ArgumentParser(
-             description="Specify the agent.")
-    parser.add_argument(
-        '-h', '--height',
-        dest='height',
-        default=3,
-        help="How many rooms on the y axis.") 
-    parser.add_argument(
-        '-w', '--width',
-        dest='width',
-        default=3,
-        help="How many rooms on the x axis.") 
-    parser.add_argument(
-        '-d', '--dirty-rooms',
-        dest='dirty',
-        default=3,
-        help="How many rooms are dirty.") 
-    parser.add_argument(
-        '-a', '--agent-type',
-        dest='agent_type',
-        default='1',
-        help="Agent type: 1: reflex, 2: random, 3: murphy's reflex, 4: murhpy's random") 
-    args = parser.parse_args()
-
-    return args
-
-
 
 class rumba():
     def __init__(self, location):
@@ -94,7 +64,7 @@ class Environment():
 
 def main():
     global env
-    env = Environment(3, 3, 9)
+    env = Environment(3, 3, 3)
     print('Starting state:')
     print (f'width = {env.width}')
     print (f'height = {env.height}')
