@@ -1,0 +1,300 @@
+Moves taken: 107
+Cleanings performed: 81
+Rooms still dirty: 0
+Moves taken: 63
+Cleanings performed: 61
+Rooms still dirty: 0
+Moves taken: 65
+Cleanings performed: 66
+Rooms still dirty: 0
+Moves taken: 76
+Cleanings performed: 67
+Rooms still dirty: 0
+Moves taken: 109
+Cleanings performed: 121
+Rooms still dirty: 0
+Moves taken: 50
+Cleanings performed: 36
+Rooms still dirty: 0
+Moves taken: 124
+Cleanings performed: 116
+Rooms still dirty: 0
+Moves taken: 23
+Cleanings performed: 23
+Rooms still dirty: 0
+Moves taken: 40
+Cleanings performed: 42
+Rooms still dirty: 0
+Moves taken: 38
+Cleanings performed: 45
+Rooms still dirty: 0
+Moves taken: 61
+Cleanings performed: 62
+Rooms still dirty: 0
+Moves taken: 83
+Cleanings performed: 75
+Rooms still dirty: 0
+Moves taken: 62
+Cleanings performed: 51
+Rooms still dirty: 0
+Moves taken: 14
+Cleanings performed: 13
+Rooms still dirty: 0
+Moves taken: 51
+Cleanings performed: 39
+Rooms still dirty: 0
+Moves taken: 26
+Cleanings performed: 25
+Rooms still dirty: 0
+Moves taken: 36
+Cleanings performed: 29
+Rooms still dirty: 0
+Moves taken: 55
+Cleanings performed: 52
+Rooms still dirty: 0
+Moves taken: 22
+Cleanings performed: 19
+Rooms still dirty: 0
+Moves taken: 36
+Cleanings performed: 39
+Rooms still dirty: 0
+Moves taken: 43
+Cleanings performed: 47
+Rooms still dirty: 0
+Moves taken: 76
+Cleanings performed: 65
+Rooms still dirty: 0
+Moves taken: 62
+Cleanings performed: 63
+Rooms still dirty: 0
+Moves taken: 32
+Cleanings performed: 30
+Rooms still dirty: 0
+Moves taken: 111
+Cleanings performed: 110
+Rooms still dirty: 0
+Moves taken: 272
+Cleanings performed: 303
+Rooms still dirty: 0
+Moves taken: 50
+Cleanings performed: 58
+Rooms still dirty: 0
+Moves taken: 124
+Cleanings performed: 106
+Rooms still dirty: 0
+Moves taken: 70
+Cleanings performed: 85
+Rooms still dirty: 0
+Moves taken: 57
+Cleanings performed: 47
+Rooms still dirty: 0
+Moves taken: 32
+Cleanings performed: 39
+Rooms still dirty: 0
+Moves taken: 70
+Cleanings performed: 56
+Rooms still dirty: 0
+Moves taken: 41
+Cleanings performed: 39
+Rooms still dirty: 0
+Moves taken: 27
+Cleanings performed: 27
+Rooms still dirty: 0
+Moves taken: 30
+Cleanings performed: 17
+Rooms still dirty: 0
+Moves taken: 45
+Cleanings performed: 41
+Rooms still dirty: 0
+Moves taken: 52
+Cleanings performed: 62
+Rooms still dirty: 0
+Moves taken: 50
+Cleanings performed: 49
+Rooms still dirty: 0
+Moves taken: 15
+Cleanings performed: 12
+Rooms still dirty: 0
+Moves taken: 61
+Cleanings performed: 62
+Rooms still dirty: 0
+Moves taken: 81
+Cleanings performed: 72
+Rooms still dirty: 0
+Moves taken: 39
+Cleanings performed: 51
+Rooms still dirty: 0
+Moves taken: 43
+Cleanings performed: 80
+Rooms still dirty: 0
+Moves taken: 39
+Cleanings performed: 30
+Rooms still dirty: 0
+Moves taken: 110
+Cleanings performed: 119
+Rooms still dirty: 0
+Moves taken: 51
+Cleanings performed: 32
+Rooms still dirty: 0
+Moves taken: 40
+Cleanings performed: 48
+Rooms still dirty: 0
+Moves taken: 17
+Cleanings performed: 17
+Rooms still dirty: 0
+Moves taken: 72
+Cleanings performed: 69
+Rooms still dirty: 0
+Moves taken: 36
+Cleanings performed: 31
+Rooms still dirty: 0
+Moves taken: 33
+Cleanings performed: 51
+Rooms still dirty: 0
+Moves taken: 31
+Cleanings performed: 48
+Rooms still dirty: 0
+Moves taken: 75
+Cleanings performed: 74
+Rooms still dirty: 0
+Moves taken: 29
+Cleanings performed: 33
+Rooms still dirty: 0
+Moves taken: 123
+Cleanings performed: 132
+Rooms still dirty: 0
+Moves taken: 18
+Cleanings performed: 18
+Rooms still dirty: 0
+Moves taken: 45
+Cleanings performed: 47
+Rooms still dirty: 0
+Moves taken: 47
+Cleanings performed: 56
+Rooms still dirty: 0
+Moves taken: 73
+Cleanings performed: 59
+Rooms still dirty: 0
+Moves taken: 75
+Cleanings performed: 78
+Rooms still dirty: 0
+Moves taken: 44
+Cleanings performed: 51
+Rooms still dirty: 0
+Moves taken: 27
+Cleanings performed: 24
+Rooms still dirty: 0
+Moves taken: 55
+Cleanings performed: 42
+Rooms still dirty: 0
+Moves taken: 75
+Cleanings performed: 64
+Rooms still dirty: 0
+Moves taken: 52
+Cleanings performed: 50
+Rooms still dirty: 0
+Moves taken: 82
+Cleanings performed: 51
+Rooms still dirty: 0
+Moves taken: 116
+Cleanings performed: 143
+Rooms still dirty: 0
+Moves taken: 47
+Cleanings performed: 39
+Rooms still dirty: 0
+Moves taken: 82
+Cleanings performed: 76
+Rooms still dirty: 0
+Moves taken: 77
+Cleanings performed: 68
+Rooms still dirty: 0
+Moves taken: 26
+Cleanings performed: 25
+Rooms still dirty: 0
+Moves taken: 58
+Cleanings performed: 58
+Rooms still dirty: 0
+Moves taken: 86
+Cleanings performed: 80
+Rooms still dirty: 0
+Moves taken: 74
+Cleanings performed: 67
+Rooms still dirty: 0
+Moves taken: 81
+Cleanings performed: 108
+Rooms still dirty: 0
+Moves taken: 62
+Cleanings performed: 63
+Rooms still dirty: 0
+Moves taken: 91
+Cleanings performed: 110
+Rooms still dirty: 0
+Moves taken: 41
+Cleanings performed: 45
+Rooms still dirty: 0
+Moves taken: 22
+Cleanings performed: 14
+Rooms still dirty: 0
+Moves taken: 16
+Cleanings performed: 19
+Rooms still dirty: 0
+Moves taken: 78
+Cleanings performed: 64
+Rooms still dirty: 0
+Moves taken: 43
+Cleanings performed: 50
+Rooms still dirty: 0
+Moves taken: 111
+Cleanings performed: 106
+Rooms still dirty: 0
+Moves taken: 70
+Cleanings performed: 70
+Rooms still dirty: 0
+Moves taken: 84
+Cleanings performed: 113
+Rooms still dirty: 0
+Moves taken: 25
+Cleanings performed: 26
+Rooms still dirty: 0
+Moves taken: 50
+Cleanings performed: 34
+Rooms still dirty: 0
+Moves taken: 52
+Cleanings performed: 46
+Rooms still dirty: 0
+Moves taken: 160
+Cleanings performed: 173
+Rooms still dirty: 0
+Moves taken: 17
+Cleanings performed: 18
+Rooms still dirty: 0
+Moves taken: 51
+Cleanings performed: 45
+Rooms still dirty: 0
+Moves taken: 55
+Cleanings performed: 42
+Rooms still dirty: 0
+Moves taken: 33
+Cleanings performed: 25
+Rooms still dirty: 0
+Moves taken: 101
+Cleanings performed: 86
+Rooms still dirty: 0
+Moves taken: 68
+Cleanings performed: 96
+Rooms still dirty: 0
+Moves taken: 42
+Cleanings performed: 31
+Rooms still dirty: 0
+Moves taken: 81
+Cleanings performed: 74
+Rooms still dirty: 0
+Moves taken: 45
+Cleanings performed: 68
+Rooms still dirty: 0
+Moves taken: 62
+Cleanings performed: 61
+Rooms still dirty: 0
+Moves taken: 34
+Cleanings performed: 36
+Rooms still dirty: 0
