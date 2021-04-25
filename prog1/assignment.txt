@@ -1,0 +1,43 @@
+programming 1
+
+turn in:
+    email the code with instructions on how to run it
+    a write up too
+        describe the three heirustics
+        for each H
+            solution path for each initial state
+            avg number of steps over the 5 trials
+        write 1 paragraph with conclusions from these results.
+
+puzzle: 8-puzzle 
+
+implement algorithms:
+    best first
+    A* search 
+
+implement heuristics
+    the 2 in the book
+    1 of your choice
+
+stop search:
+    if not reach goal state
+    after max number of steps
+
+input: configuration of the 8 puzzle like:
+    (4 5 b 6 1 8 7 3 2)
+    b = where the blank one is
+
+    goal sate:
+    (1 2 3 4 5 6 7 8 b)
+
+initial states
+    run on 5 of them
+    output the solution path found (if any)
+    eg:
+    (4 5 b 6 1 8 7 3 2) → (4 b 5 6 1 8 7 3 2) → ... → (1 2 3 4 5 6 7 8 b)
+
+XC
+    extra credit
+    repeat for 15-puzzle (4x4)
+    exclude the solution paths
+    include number of steps per each heuristic.

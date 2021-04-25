@@ -137,8 +137,8 @@ def main():
         print('Starting state:')
         print (f'width = {env.width}')
         print (f'height = {env.height}')
-        for i in range(3):
-            for j in range(3):
+        for i in range(width):
+            for j in range(height):
                 print(f"Room {i},{j} is clean: {env.rooms[i][j]['clean']}")
         print('-----')
     z = rumba(0)
@@ -149,8 +149,8 @@ def main():
     for i in range(100):
         while any_dirty == True:
             any_dirty = False
-            for i in range(3):
-                for j in range(3):
+            for i in range(width):
+                for j in range(height):
                     if not env.rooms[i][j]['clean']:
                         any_dirty = True
             #print(f'Rumba is at: {z.location}.')
@@ -166,7 +166,7 @@ def main():
                     z.clean()
                     cleans += 1
             elif agent_type == 2:
-                if randint(0,1) == 0:
+                if randint(0,2) == 0:
                     z.clean()
                     cleans += 1
                 else:
@@ -174,8 +174,8 @@ def main():
                     moves += 1
 
     dirty_rooms = 0
-    for i in range(3):
-        for j in range(3):
+    for i in range(width):
+        for j in range(height):
             if not {env.rooms[i][j]['clean']}:
                 dirty_rooms += 1
 
