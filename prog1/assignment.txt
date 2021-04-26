@@ -9,11 +9,12 @@ turn in:
             avg number of steps over the 5 trials
         write 1 paragraph with conclusions from these results.
 
-puzzle: 8-puzzle 
+toy problem: 8-puzzle 
 
-implement algorithms:
+implement heuristic search strategy algorithms:
     best first
     A* search 
+    1 of your choice
 
 implement heuristics
     the 2 in the book
