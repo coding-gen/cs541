@@ -53,7 +53,6 @@ class blank():
 def h_n(state):
     # heuristic: sum for each tile: count of moves away from its goal position.
     h_cost = 0
-    print (state)
     for position in range(len(state)):
         moves = 0
         distance = abs(state[position] - (position + 1))
@@ -109,8 +108,23 @@ class Environment():
         env.swap(original_position)
 
 
-def next_move(env, state):
-    pass
+def next_move(env):
+    actions = []
+    check_env = env
+    check_env.move_blank('U')
+    actions.append((h_n(check_env.state), 'U'))
+    check_env = env
+    check_env.move_blank('D')
+    actions.append((h_n(check_env.state), 'D'))
+    check_env = env
+    check_env.move_blank('L')
+    actions.append((h_n(check_env.state), 'L'))
+    check_env = env
+    check_env.move_blank('R')
+    actions.append((h_n(check_env.state), 'R'))
+    actions.sort(reverse = True)
+    print(f'actions: {actions}')
+    return actions.pop()
 
 
 def main():
@@ -125,24 +139,19 @@ def main():
     env = Environment(width, height, start_state)
 
     print(f'start state is: {env.state}')
-    h_cost = h_n(env.state)
-    print(f'heuristic cost is: {h_cost}')
-    print(f'blank is at: {env.blank.location}')
-
-    env.move_blank('U')
-    print(f'state is: {env.state}')
-    print(f'heuristic cost is: {h_n(env.state)}')
-
-    env.move_blank('L')
-    print(f'state is: {env.state}')
-    print(f'heuristic cost is: {h_n(env.state)}')
-
-    env.move_blank('D')
-    print(f'state is: {env.state}')
-    print(f'heuristic cost is: {h_n(env.state)}')
-    env.move_blank('R')
-    print(f'state is: {env.state}')
-    print(f'heuristic cost is: {h_n(env.state)}')
+    state_moves = [env.state]
+    total_cost = 0
+    goal_reached = False
+    moves = 0
+    while not goal_reached and moves < 5:
+        if h_n(env.state) == 0:
+            print(f'goal state reached. \nCost: {total_cost}.\nMoves: {state_moves}')
+            goal_reached = True
+        else:
+            move = next_move(env)
+            print(f'h(current_state) = {h_n(env.state)}')
+            print(f'Next move is: {move[1]} and its h is: {move[0]}')
+            moves += 1
 
 
 
