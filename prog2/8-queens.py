@@ -192,7 +192,11 @@ def main():
     env = Environment(population)
 
     f = open('queens.log', 'a')
-    logger(f, 1)
+    goal_reached = logger(f, 1)
+    if goal_reached:
+        print(f'Goal reached in generation 1.')
+        f.close()
+        return
 
     # Don't let users set the step too high if the mutation starts out low.
     if mutation < 10 and step > 0:
@@ -204,7 +208,7 @@ def main():
         mutate(mutation)
         goal_reached = logger(f, gen+2)
         if goal_reached:
-            print(f'Goal reached in generation {gen}.')
+            print(f'Goal reached in generation {gen+2}.')
             break
         else: 
             mutation -= step
