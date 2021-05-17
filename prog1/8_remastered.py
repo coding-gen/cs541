@@ -117,6 +117,7 @@ class Environment():
 
 
 def solveable(state):
+    # Todo: remove b from list
     inversions = 0
     for position in range(len(state)):
         if state[position] != 8:
