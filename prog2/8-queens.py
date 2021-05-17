@@ -27,13 +27,18 @@ def parse_args():
     parser.add_argument(
         '-m', '--mutation_probability',
         dest='mutation',
-        default='0.01',
-        help="Probability of random mutations.")
+        default='80',
+        help="Percent probability of random mutations, eg: 10.")
     parser.add_argument(
         '-p', '--population_size',
         dest='population',
         default='10',
         help="Initial size of the population.")
+    parser.add_argument(
+        '-s', '--mutation_step',
+        dest='step',
+        default='5',
+        help="How fast to linearly reduce the  mutation.")
     parser.add_argument(
         '-v', '--verbose',
         dest='verbose',
@@ -45,11 +50,9 @@ def parse_args():
 
 def logger(f, generation):
     goal_reached = False
-    divider = '-' * (13 + round(log(generation, 10)))
-    content = f'\n{divider}\nGeneration: {generation}\n{divider}\n'
+    content = ''
     content += 'generation\tfitness\tboard\n'
     for board in env.herd:
-        #print(env.herd[i])
         content += f'{generation}\t{board[0]}\t{board[1]}\n'
         if board[0] == 0:
             goal_reached = True
@@ -125,7 +128,7 @@ def cull():
         env.herd[len(env.herd)-(i+1)] = env.herd[i]
     # Shuffle up again before cross breeding.
     # Should we shuffle, or should best breed with best?
-    env.herd = sorted(env.herd, key=myrand)
+    # env.herd = sorted(env.herd, key=myrand)
 
 def assess_split(mother, father):
     # Find the best split point for these parents
@@ -167,15 +170,12 @@ def cross():
     pass
 
 
-def mutate():
-    pass
+def mutate(mutation):
+    # individual: (fitness, board): (2, [2, 4, 1, 7, 0, 3, 6, 2])
+    for individual in env.herd:
+        if randint(0,100) < mutation:
+            individual[1][randint(0,7)] = randint(0,7)
 
-
-def breed():
-    cull()
-    cross()
-    pass
-    
 
 def main():
     global env
@@ -183,6 +183,7 @@ def main():
     generations = int(args.generations)
     mutation = float(args.mutation)
     population = int(args.population)
+    step = int(args.step)
     verbose = args.verbose
     f = open('queens.log', 'w')
     f.write('')
@@ -192,12 +193,21 @@ def main():
 
     f = open('queens.log', 'a')
     logger(f, 1)
+
+    # Don't let users set the step too high if the mutation starts out low.
+    if mutation < 10 and step > 0:
+        step = 1
+
     for gen in range(generations-1):
-        breed()
+        cull()
+        cross()
+        mutate(mutation)
         goal_reached = logger(f, gen+2)
         if goal_reached:
-            print('Goal reached')
+            print(f'Goal reached in generation {gen}.')
             break
+        else: 
+            mutation -= step
     f.close()
 
 
