@@ -149,33 +149,32 @@ class Q_table():
 
     def choose_action(self, percepts, epsilon):
         # If we haven't seen this state yet, init all its actions to reward 0.
-        if percepts not in self.table: 
+        if tuple(percepts) not in self.table: 
             # For the state of (0,0,0,0,0) for each action the reward is 0
             # t[(0,0,0,0,0)] = (0,0,0,0,0)
             # Init the reward for all actions in this state to 0.
-            self.table[percepts] = [0, 0, 0, 0, 0]
+            self.table[tuple(percepts)] = [0, 0, 0, 0, 0]
             # EG access action 3 (Left) as t[(0,0,0,0,0)][3]
 
+        # All possible actions
+        actions = self.table[tuple(percepts)]
+        # Init to all the possible actions
+        actions_for_rand = self.table[tuple(percepts)]
         if randint(0,100) > (epsilon * 10):
-            actions_list = self.table[percepts]
-            max_value = max(actions_list)
-            if actions_list.count(max_value) > 1:
-                # randomly pick one action, if the max reward is tied
-                actions_for_rand = []
+            max_value = max(actions)
 
-                # Use one of the tied actions, at random
-                for i in range(len(actions_list)):
-                    if actions_list[i] == max_value:
+            # If one action has a best reward, use it (hill climb).
+            if actions.count(max_value) == 1:
+                actions_for_rand = [actions.index(max_value)]
+
+            # Otherwise pick one of the tied max rewards at random
+            else:
+                actions_for_rand = []
+                for i in range(len(actions)):
+                    if actions[i] == max_value:
                         actions_for_rand.append(i)
 
-            # Use the action with the highest reward (hill climb / gradient descent)
-            else:
-                actions_for_rand = actions_list.index(max_value)
-
-        # Randomize if epsilon
-        else:
-            actions_for_rand = self.table[percepts]
-        return actions_list[randint(0,len(actions_for_rand))]
+        return actions[randint(0,len(actions_for_rand)-1)]
 
 
 
@@ -234,7 +233,7 @@ class Robbie():
         # If it's a wall lose reward -5.
         # Up
         if action == 0:
-            record(action_sequence, 0)
+            record(self.action_sequence, 0)
             if self.y == 0:
                 self.reward -= 5
             else:
@@ -242,7 +241,7 @@ class Robbie():
 
         # Down
         if action == 1:
-            record(action_sequence, 1)
+            record(self.action_sequence, 1)
             if self.y == 9:
                 self.reward -= 5
             else:
@@ -250,7 +249,7 @@ class Robbie():
 
         # Left
         if action == 2:
-            record(action_sequence, 2)
+            record(self.action_sequence, 2)
             if self.x == 0:
                 self.reward -= 5
             else:
@@ -258,7 +257,7 @@ class Robbie():
 
         # Right
         if action == 3:
-            record(action_sequence, 3)
+            record(self.action_sequence, 3)
             if self.x == 9:
                 self.reward -= 5
             else:
@@ -266,7 +265,7 @@ class Robbie():
 
         # Pick Up
         if action == 4:
-            record(action_sequence, 4)
+            record(self.action_sequence, 4)
             if env.board[self.x][self.y] == 1:
                 env.board[self.x][self.y] = 0
                 self.reward += 10
@@ -308,7 +307,6 @@ def main():
     cans = int(args.cans)
     width = int(args.width)
     height = int(args.height)
-    step = int(args.step)
     verbose = args.verbose
     episodes = int(args.episodes)
     trials = int(args.trials)
@@ -346,7 +344,7 @@ def main():
             original_reward = copy(rob.reward)
             original_percepts = rob.sense()
             # Read the Q table and choose an action with a high reward with greater probability.
-            print(f'action = {choose_action(original_percepts, epsilon)}')
+            print(f'action = {q.choose_action(original_percepts, epsilon)}')
             # A small random chance epsilon to still explore some random action instead though.
             # Can start epsilon high and slowly reduce like annealing.
             # Maybe reduce, at a rate slightly faster than the count of episodes.
