@@ -150,11 +150,8 @@ class Q_table():
     def choose_action(self, percepts, epsilon):
         # If we haven't seen this state yet, init all its actions to reward 0.
         if tuple(percepts) not in self.table: 
-            # For the state of (0,0,0,0,0) for each action the reward is 0
-            # t[(0,0,0,0,0)] = (0,0,0,0,0)
-            # Init the reward for all actions in this state to 0.
             self.table[tuple(percepts)] = [0, 0, 0, 0, 0]
-            # EG access action 3 (Left) as t[(0,0,0,0,0)][3]
+            # EG access reward for action 3 (Left) as t[(0,0,0,0,0)][3]
 
         # All possible actions
         actions = self.table[tuple(percepts)]
@@ -173,8 +170,10 @@ class Q_table():
                 for i in range(len(actions)):
                     if actions[i] == max_value:
                         actions_for_rand.append(i)
+        print (f'possible actions: {actions}')
+        print (f'possible rand actions: {actions_for_rand}')
 
-        return actions[randint(0,len(actions_for_rand)-1)]
+        return randint(0,len(actions_for_rand)-1)
 
 
 
@@ -351,8 +350,10 @@ def main():
             # aka once we're about to be done, we want to be making the best choices
 
             # Just any random action
-            action = randint(0,4)
+            # action = randint(0,4)
 
+            # An action from the Q table
+            action = q.choose_action(original_percepts, epsilon)
 
             rob.take_action(action)
             logger(f, rob, action)
