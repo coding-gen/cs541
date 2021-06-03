@@ -30,10 +30,10 @@ def parse_args():
         default=10,
         help="How many squares on the y axis.")
     parser.add_argument(
-        '-s', '--step-size',
-        dest='step',
-        default='5',
-        help="The step size, gamma.")
+        '-r', '--random-epsilon',
+        dest='epsilon',
+        default='0.1',
+        help="Percent probability of randomness, starting value.")
     parser.add_argument(
         '-c', '--can-count',
         dest='cans',
@@ -45,10 +45,20 @@ def parse_args():
         default=False,
         action="store_true",
         help="Print verbose lines for debugging.")
+    parser.add_argument(
+        '-e', '--episodes',
+        dest='episodes',
+        default=2,
+        help="Number of learning episodes Robby gets.")
+    parser.add_argument(
+        '-t', '--trials',
+        dest='trials',
+        default=2,
+        help="Number of trials/actions in each episode.")
     args = parser.parse_args()
     return args
 
-def logger(f, rob):
+def logger(f, rob, action = -1):
     # Print robby info: location, current reward, maybe percepts
     # Print board info: graphical representation of spaces, cans, and robbie
     # separate with tabs to ensure equal spacing, or set eequal char width setting.
@@ -58,6 +68,18 @@ def logger(f, rob):
     content = ''
     content += f"Robbie's position: {rob.x}, {rob.y}\n"
     content += f"Robbie's reward: {rob.reward}\n"
+    if action >= 0:
+        if action == 0: 
+            action = 'Up'
+        elif action == 1:
+            action = 'Down'
+        elif action == 2:
+            action = 'Left'
+        elif action == 3:
+            action = 'Right'
+        elif action == 4:
+            action = 'Pick Up'
+        content += f"Action Robbie took: {action}.\n"
 
     content += '   0  1  2  3  4  5  6  7  8  9\n'
     for y in range(len(env.board[0])):
@@ -67,16 +89,13 @@ def logger(f, rob):
         content += f'{env.board[len(env.board)-1][y]}'
         content += '\n'
     content += '\n'
-    """
-    for i in range(len(env.board)):
-       content += f'{i} {env.board[i]}\n'
-       """
+
     f.write(content)
     return 
 
 
 def value(board):
-    # back propagate
+    # back propagate values
 
     """
     # Iterate the board
@@ -104,9 +123,69 @@ def value(board):
     pass
 
 
-class Q_Table():
+class Q_table():
     def __init__(self):
-        table = dict()
+        self.table = dict()
+        # key: (state, last 3 actions), value: dict
+            # key: next action, value: reward
+        # (percepts 5 with 3 possible values)
+        # (previous actions 3 with 5 possible actions)
+        # (next actions 1 with 5 possible actions)
+        # 1 reward value for each of those above
+        """
+        percepts = [0, 0, 0, 0, 0]
+        for p in range(5):
+            percepts.append([-1, 0, 1]) 
+        actions = [0, 1, 2, 3, 4]
+
+        # I'll go ahead and init illegal states to 0 for simplicity.
+        # For every possible combination of percepts, set the reward of each possible action to 0.
+        for percept in range(len(percepts)):
+            for p_value in percept:
+                for action in actions:
+                    self.table[percepts] =  
+        """
+        pass
+
+    def choose_action(self, percepts, epsilon):
+        # If we haven't seen this state yet, init all its actions to reward 0.
+        if percepts not in self.table: 
+            # For the state of (0,0,0,0,0) for each action the reward is 0
+            # t[(0,0,0,0,0)] = (0,0,0,0,0)
+            # Init the reward for all actions in this state to 0.
+            self.table[percepts] = [0, 0, 0, 0, 0]
+            # EG access action 3 (Left) as t[(0,0,0,0,0)][3]
+
+        if randint(0,100) > (epsilon * 10):
+            actions_list = self.table[percepts]
+            max_value = max(actions_list)
+            if actions_list.count(max_value) > 1:
+                # randomly pick one action, if the max reward is tied
+                actions_for_rand = []
+
+                # Use one of the tied actions, at random
+                for i in range(len(actions_list)):
+                    if actions_list[i] == max_value:
+                        actions_for_rand.append(i)
+
+            # Use the action with the highest reward (hill climb / gradient descent)
+            else:
+                actions_for_rand = actions_list.index(max_value)
+
+        # Randomize if epsilon
+        else:
+            actions_for_rand = self.table[percepts]
+        return actions_list[randint(0,len(actions_for_rand))]
+
+
+
+
+def record(l, x):
+    # Remember the last 3 moves.
+    if len(l) > 2:
+        l.pop(0)
+    l.append(x)
+    return
 
 
 class Robbie():
@@ -114,6 +193,7 @@ class Robbie():
         self.x = x
         self.y = y
         self.reward = 0
+        self.action_sequence = []
 
     def sense(self):
         #global env
@@ -152,9 +232,9 @@ class Robbie():
     def take_action(self, action):
         # Move up, down, left, or right
         # If it's a wall lose reward -5.
-
         # Up
         if action == 0:
+            record(action_sequence, 0)
             if self.y == 0:
                 self.reward -= 5
             else:
@@ -162,6 +242,7 @@ class Robbie():
 
         # Down
         if action == 1:
+            record(action_sequence, 1)
             if self.y == 9:
                 self.reward -= 5
             else:
@@ -169,6 +250,7 @@ class Robbie():
 
         # Left
         if action == 2:
+            record(action_sequence, 2)
             if self.x == 0:
                 self.reward -= 5
             else:
@@ -176,6 +258,7 @@ class Robbie():
 
         # Right
         if action == 3:
+            record(action_sequence, 3)
             if self.x == 9:
                 self.reward -= 5
             else:
@@ -183,6 +266,7 @@ class Robbie():
 
         # Pick Up
         if action == 4:
+            record(action_sequence, 4)
             if env.board[self.x][self.y] == 1:
                 env.board[self.x][self.y] = 0
                 self.reward += 10
@@ -208,6 +292,7 @@ class Environment():
             self.board.append(copy(y))
 
         # Fill cans in random spots
+        # TODO fix this is meant to be 50/50 chance to have a can
         for i in range(cans):
             x = randint(0,9)
             y = randint(0,9)
@@ -225,10 +310,22 @@ def main():
     height = int(args.height)
     step = int(args.step)
     verbose = args.verbose
+    episodes = int(args.episodes)
+    trials = int(args.trials)
+    epsilon = float(args.epsilon)
     f = open('robby.log', 'w')
     f.write('')
+    # After coding, defaults should be:
+    # episodes: 5000
+    # trials/steps/actions: 200
+    # n = 0.2
+    # g = 0.9
+    # For epsilon greedy, e = p(doing non-optimal/greedy/hill-climb action)
+    # e=0.1 initially, reduce about every 50 epochs till 0, and stays
 
     # get setup
+
+    q = Q_table()
     env = Environment(width,height,cans)
     # Place Robby
     x = randint(0,9)
@@ -237,22 +334,39 @@ def main():
 
     logger(f, rob)
 
-    print(f'start x:{rob.x}, y:{rob.y}, r:{rob.reward} p:{rob.sense()}')
-    rob.take_action(0)
-    print(f'up x:{rob.x}, y:{rob.y}, r:{rob.reward} p:{rob.sense()}')
-    rob.take_action(1)
-    print(f'down x:{rob.x}, y:{rob.y}, r:{rob.reward} p:{rob.sense()}')
-    rob.take_action(2)
-    print(f'left x:{rob.x}, y:{rob.y}, r:{rob.reward} p:{rob.sense()}')
-    rob.take_action(3)
-    print(f'right x:{rob.x}, y:{rob.y}, r:{rob.reward} p:{rob.sense()}')
-    rob.take_action(4)
-    print(f'pickup x:{rob.x}, y:{rob.y}, r:{rob.reward} p:{rob.sense()}')
+    # Learning
+    # Trials
+    for e in range(episodes):
+        # Episodes
+        # New distribution of cans
+        # New Robbie position
+        # Same Q-matrix
+        for t in range(trials):
+            # Take a random action
+            original_reward = copy(rob.reward)
+            original_percepts = rob.sense()
+            # Read the Q table and choose an action with a high reward with greater probability.
+            print(f'action = {choose_action(original_percepts, epsilon)}')
+            # A small random chance epsilon to still explore some random action instead though.
+            # Can start epsilon high and slowly reduce like annealing.
+            # Maybe reduce, at a rate slightly faster than the count of episodes.
+            # aka once we're about to be done, we want to be making the best choices
+
+            # Just any random action
+            action = randint(0,4)
 
 
-    # anytime to log
-    f = open('robby.log', 'a')
-    logger(f, rob)
+            rob.take_action(action)
+            logger(f, rob, action)
+
+            # Update the q table with the state, action, and reward from that action
+            # Record the original percepts, reward (as diff of original, new reward), action taken, new percepts
+            # Maybe also record the 3 previous actions as part of the state, along with percepts.
+
+            action_reward = rob.reward - original_reward
+        # Track the total reward of the episode, make charts on this (1 point per 100 episodes)
+        # Avg: sum of rewards per episode, std dev aka test average and test-std-dev
+
     f.close()
 
 if __name__ == '__main__':
