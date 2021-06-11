@@ -11,8 +11,13 @@ import argparse
 from random import randint
 from math import floor, ceil, log
 from statistics import stdev, variance, mean
+import psycopg2
+from psycopg2 import sql
 
 global env
+global sample_stats
+global cardinality_stats
+
 
 def parse_args():
     """Parse command line arguments"""
@@ -187,42 +192,82 @@ def mutate(mutation):
             individual[1][randint(0,7)] = randint(0,7)
 
 
-def connect_to_db():
-    pass
+# connect to the database
+def dbconnect(dbname, username, passwd, hostname='localhost'):
+  connection = psycopg2.connect(
+        host=hostname,
+        database=dbname,
+        user=username,
+        password=passwd,
+  )
+  connection.autocommit = True
+  return connection
 
 
-def cardinality(table_name = 'tester'):
-    # connect to database
-    distinct = 0
-    # select count distinct id from table_name
-    return distinct
+def collect_cardinality(conn, table_name = 'tester'):
+    cardinality = 0
+    with conn.cursor() as cursor:
+        # Get the count of distinct values of the ID as the cardinality.
+        cmd = sql.SQL(f"SELECT count(distinct id) FROM {table_name};")
+        cursor.execute(cmd)
+        cardinality = cursor.fetchone()
+    return cardinality[0]
 
 
-def local_sample(table_name):
-    # connect to database
+def collect_sample(conn, table_name):
     sample_table = []
-    # randomly select a portion of the table select id from table_name WHERE id = randint(0,1000)
-    # store locally
-    # call this for each table
-    # use this in the value function
-    return sample_table
+    with conn.cursor() as cursor:
+        # Sample 0.1% of the source table
+        cmd = sql.SQL(f"SELECT id FROM {table_name} WHERE 1 = round(random()*100);")
+        cursor.execute(cmd)
+        sample_table = cursor.fetchall()
+    return [x[0] for x in sample_table]
+
+
+def analyze_tables(conn, tables):
+    # Collect cardinality stats and a sampling table, stored locally.
+    global sample_stats
+    global cardinality_stats
+    sample_stats = []
+    cardinality_stats = []
+    for i in range(len(tables)):
+        # collect stats on each table 
+        cardinality_stats.append(collect_cardinality(conn, tables[i]))
+        sample_stats.append(collect_sample(conn, tables[i]))
+    return
 
 
 def main():
     global env
+    global sample_stats
+    global cardinality_stats
+
     args = parse_args()
     tables = args.tables
     # tables will be identified by their index, in alphabetical order
-    tables.sort()
     generations = int(args.generations)
     mutation = float(args.mutation)
     population = int(args.population)
     step = int(args.step)
     verbose = args.verbose
+
     f = open('optimizer.log', 'w')
     f.write('')
     f.close()
 
+    conn = dbconnect('test', 'admin', 'rhodes')
+
+    tables.sort()
+    analyze_tables(conn, tables)
+
+    conn.close()
+    if verbose:
+        print(tables)
+        for i in range(len(tables)):
+            print(f'cardinality of table {tables[i]} is {cardinality_stats[i]}')
+            print(f'sample of table {tables[i]} is {sample_stats[i]}')
+
+    """
     env = Environment(population)
 
     f = open('optimizer.log', 'a')
@@ -243,6 +288,7 @@ def main():
         else: 
             mutation -= step
     f.close()
+    """
 
 
 if __name__ == '__main__':
