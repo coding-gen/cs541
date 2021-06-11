@@ -18,7 +18,7 @@ def parse_args():
     """Parse command line arguments"""
 
     parser = argparse.ArgumentParser(
-             description="Specify parameters for the 8 queens problem and genetic algorithm.")
+             description="Specify parameters for the robby the reinforcement learning robot.")
     parser.add_argument(
         '-x', '--width',
         dest='width',
@@ -34,11 +34,6 @@ def parse_args():
         dest='epsilon',
         default='0.1',
         help="Percent probability of randomness, starting value.")
-    parser.add_argument(
-        '-c', '--can-count',
-        dest='cans',
-        default='20',
-        help="The count of cans to strew around the room.")
     parser.add_argument(
         '-v', '--verbose',
         dest='verbose',
@@ -58,7 +53,7 @@ def parse_args():
     args = parser.parse_args()
     return args
 
-def logger(f, rob, action = -1):
+def logger(f, rob, t, action = -1):
     # Print robby info: location, current reward, maybe percepts
     # Print board info: graphical representation of spaces, cans, and robbie
     # separate with tabs to ensure equal spacing, or set eequal char width setting.
@@ -68,7 +63,7 @@ def logger(f, rob, action = -1):
     content = ''
     content += f"Robbie's position: {rob.x}, {rob.y}\n"
     content += f"Robbie's reward: {rob.reward}\n"
-    if action >= 0:
+    if action >= 0 and t >= 0:
         if action == 0: 
             action = 'Up'
         elif action == 1:
@@ -79,7 +74,9 @@ def logger(f, rob, action = -1):
             action = 'Right'
         elif action == 4:
             action = 'Pick Up'
-        content += f"Action Robbie took: {action}.\n"
+        content += f"For action {t} Robbie took: {action}.\n"
+    else:
+        content += f"Starting State.\n"
 
     content += '   0  1  2  3  4  5  6  7  8  9\n'
     for y in range(len(env.board[0])):
@@ -170,8 +167,6 @@ class Q_table():
                 for i in range(len(actions)):
                     if actions[i] == max_value:
                         actions_for_rand.append(i)
-        print (f'possible actions: {actions}')
-        print (f'possible rand actions: {actions_for_rand}')
 
         return randint(0,len(actions_for_rand)-1)
 
@@ -275,35 +270,23 @@ class Robbie():
 
 
 class Environment():
-    def __init__(self, width, height, cans):
+    def __init__(self, width, height):
         # board size
         self.size = width * height
         self.width = width
         self.height = height
         # a list of lists
         self.board = []
-        y = []
-        for j in range(height):
-            y.append(0)
-            
         for i in range(width):
-            self.board.append(copy(y))
-
-        # Fill cans in random spots
-        # TODO fix this is meant to be 50/50 chance to have a can
-        for i in range(cans):
-            x = randint(0,9)
-            y = randint(0,9)
-            if self.board[x][y] == 0:
-                self.board[x][y] = 1
-            else:
-                i -= 1
+            y = []
+            for j in range(height):
+                y.append(randint(0,1))
+            self.board.append(y)
 
 
 def main():
     global env
     args = parse_args()
-    cans = int(args.cans)
     width = int(args.width)
     height = int(args.height)
     verbose = args.verbose
@@ -320,30 +303,21 @@ def main():
     # For epsilon greedy, e = p(doing non-optimal/greedy/hill-climb action)
     # e=0.1 initially, reduce about every 50 epochs till 0, and stays
 
-    # get setup
-
+    # Only one Q-table for all trials
     q = Q_table()
-    env = Environment(width,height,cans)
-    # Place Robby
-    x = randint(0,9)
-    y = randint(0,9)
-    rob = Robbie(x,y)
 
-    logger(f, rob)
-
-    # Learning
-    # Trials
     for e in range(episodes):
-        # Episodes
-        # New distribution of cans
-        # New Robbie position
         # Same Q-matrix
+        # New distribution of cans
+        env = Environment(width,height)
+        # New Robbie position
+        rob = Robbie(randint(0, width - 1),randint(0, height - 1))
+        logger(f, rob, -1)
+
         for t in range(trials):
-            # Take a random action
             original_reward = copy(rob.reward)
             original_percepts = rob.sense()
-            # Read the Q table and choose an action with a high reward with greater probability.
-            print(f'action = {q.choose_action(original_percepts, epsilon)}')
+
             # A small random chance epsilon to still explore some random action instead though.
             # Can start epsilon high and slowly reduce like annealing.
             # Maybe reduce, at a rate slightly faster than the count of episodes.
@@ -355,8 +329,12 @@ def main():
             # An action from the Q table
             action = q.choose_action(original_percepts, epsilon)
 
+            # Reduce less at the start, then faster toward the end
+            # About last 10% of trials have epsilon at 0, aka greedy hill climb
+            epsilon *= ((trials - t - t*0.025) * 0.999) / (trials - t)
+
             rob.take_action(action)
-            logger(f, rob, action)
+            logger(f, rob, t, action)
 
             # Update the q table with the state, action, and reward from that action
             # Record the original percepts, reward (as diff of original, new reward), action taken, new percepts
