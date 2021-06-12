@@ -20,6 +20,7 @@ global env
 global sample_stats
 global cardinality_stats
 global rowcount_stats
+global random_tree
 
 
 def parse_args():
@@ -223,6 +224,16 @@ def dbconnect(dbname, username, passwd, hostname='localhost'):
   return connection
 
 
+def collect_rowcount(conn, table_name):
+    rows = 0
+    with conn.cursor() as cursor:
+        # Get the count of distinct values of the ID as the cardinality.
+        cmd = sql.SQL(f"SELECT COUNT(*) FROM {table_name};")
+        cursor.execute(cmd)
+        rows = cursor.fetchone()
+    return rows[0]
+
+
 def collect_cardinality(conn, table_name = 'tester'):
     cardinality = 0
     with conn.cursor() as cursor:
@@ -233,25 +244,22 @@ def collect_cardinality(conn, table_name = 'tester'):
     return cardinality[0]
 
 
-def collect_sample(conn, table_name):
+def collect_sample(conn, table_name, table_size):
     sample_table = []
+
+    # Adjust the amount sampled according to the size of the source table
+    # So long as we are getting a statistically random sample,
+    # We can use it to estimate selectivity.
+    n = 1
+    if table_size > 1000: 
+        n = round(log(table_size, 2))
+
     with conn.cursor() as cursor:
         # Sample 0.1% of the source table
-        cmd = sql.SQL(f"SELECT id FROM {table_name} WHERE 1 = round(random()*100);")
+        cmd = sql.SQL(f"SELECT id FROM {table_name} WHERE 1 = ceil(random()*{n});")
         cursor.execute(cmd)
         sample_table = cursor.fetchall()
     return [x[0] for x in sample_table]
-
-
-def collect_rowcount(conn, table_name):
-    rows = 0
-    with conn.cursor() as cursor:
-        # Get the count of distinct values of the ID as the cardinality.
-        cmd = sql.SQL(f"SELECT COUNT(*) FROM {table_name};")
-        cursor.execute(cmd)
-        rows = cursor.fetchone()
-    return rows[0]
-    pass
 
 
 def analyze_tables(conn, tables):
@@ -262,32 +270,44 @@ def analyze_tables(conn, tables):
     sample_stats = []
     cardinality_stats = []
     rowcount_stats = []
+
     for i in range(len(tables)):
         # collect stats on each table 
         rowcount_stats.append(collect_rowcount(conn,tables[i]))
         cardinality_stats.append(collect_cardinality(conn, tables[i]))
-        sample_stats.append(collect_sample(conn, tables[i]))
+        sample_stats.append(collect_sample(conn, tables[i], rowcount_stats[i]))
     return
 
 
-def build_random_tree(table_list, result=[]):
+def build_random_tree(table_list):
+    global random_tree
+    # TODO this breaks for 3+ trees, find out why.
+
     # recursively split the tree until you're at individual elements
     # while randomly rearanging the elements in each subtree
     # at each split re-add the left/right children as a new list to this list
     local_tables = copy(table_list)
     # Shuffle so the order is random
     shuffle(local_tables)
+    print(local_tables)
     if len(local_tables) > 2:
         # We want at least 1 element in the left tree, at lest one in the right
         splitter = randint(1,len(local_tables)-1)
-        result.append(build_random_tree(local_tables[0:splitter],result))
-        result.append(build_random_tree(local_tables[splitter:len(local_tables)],result))
+        left = build_random_tree(local_tables[0:splitter])
+        if left:
+            random_tree.append(left)    
+        right = build_random_tree(local_tables[splitter:len(local_tables)])
+        if right:
+            random_tree.append(right)
     else:
-        return [local_tables]
+        print(f'local string to return is {local_tables}')
+        return local_tables
+    return
 
 
 class Environment():
     def __init__(self, tables, population):
+        global random_tree
         # Encode as id of table in tables list
         # Separated by join level int.
         
@@ -301,7 +321,9 @@ class Environment():
         
         # Create individuals.
         for individual in range(population):
-            self.herd.append(build_random_tree(tables))
+            random_tree = []
+            build_random_tree(tables)
+            self.herd.append(random_tree)
 
 
 def main():
@@ -339,6 +361,11 @@ def main():
 
     env = Environment(tables, population)
     print(f'herd of {population} individuals is: {env.herd}')
+    for individual in env.herd:
+        for item in individual:
+            print(f'type of item is: {type(item[0])}')
+            if len(item) > 2:
+                print(f'content is {item}')
     """
     f = open('optimizer.log', 'a')
     logger(f, 1)
