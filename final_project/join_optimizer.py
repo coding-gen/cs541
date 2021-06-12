@@ -8,15 +8,18 @@
 # Author: Genevieve LaLonde
 
 import argparse
-from random import randint
+from random import randint, shuffle
 from math import floor, ceil, log
 from statistics import stdev, variance, mean
 import psycopg2
 from psycopg2 import sql
+from copy import copy
+
 
 global env
 global sample_stats
 global cardinality_stats
+global rowcount_stats
 
 
 def parse_args():
@@ -97,31 +100,9 @@ def fitness(board):
     return attacking
 
 
-
-class Environment():
-    def __init__(self, population):
-        # Encode as random int from 0 to len of table list
-        # create list of ints from 0 - len of table list
-        # random sort, pop repeatedly and append between table ids
-        
-        # One list to hold all individuals in the population.
-        self.herd = []
-
-        # Create individuals.
-        # Board is always 8X8
-        # List of 8 elements
-        # For each line, the index is the line number,
-        # Its value is the location of the queen.
-        # Place one queen at a random location in each list.
-        for individual in range(population):
-            board = []
-            for queen in range(8):
-                board.append(randint(0, 7))
-            self.herd.append((fitness(board), board))
-
-
 def myrand(x):
-    return randint(0, len(env.herd))
+    # x = len(env.herd)
+    return randint(0, x)
 
 
 def cull():
@@ -192,6 +173,44 @@ def mutate(mutation):
             individual[1][randint(0,7)] = randint(0,7)
 
 
+def inversion():
+    # invert an individual
+    pass
+
+
+def increase_test_hardness():
+    # make it harder to pass the test
+    # eg hosts and parasited from Hillis as described in: 
+    # An Intro to Genetic Algorithms, by Melanie Mitchell
+    pass
+
+
+def roulette():
+    pass
+
+
+def rank_fitness():
+    pass
+
+
+def random_death():
+    # with or without elitism
+    pass
+
+def wrong_side_of_railroad_tracks():
+    # In selection, breeding can only happen if both members are
+    # both in the same upper half or lower half of population fitness
+    # With small chance of Tony and Maria to fall in love.
+    # May or may not be accompanied by mass random death.
+    pass
+
+
+def wandering_salesman():
+    # No, not the one you're thinking. 
+    # A random, unrelated addition to the population.
+    pass
+
+
 # connect to the database
 def dbconnect(dbname, username, passwd, hostname='localhost'):
   connection = psycopg2.connect(
@@ -224,23 +243,72 @@ def collect_sample(conn, table_name):
     return [x[0] for x in sample_table]
 
 
+def collect_rowcount(conn, table_name):
+    rows = 0
+    with conn.cursor() as cursor:
+        # Get the count of distinct values of the ID as the cardinality.
+        cmd = sql.SQL(f"SELECT COUNT(*) FROM {table_name};")
+        cursor.execute(cmd)
+        rows = cursor.fetchone()
+    return rows[0]
+    pass
+
+
 def analyze_tables(conn, tables):
     # Collect cardinality stats and a sampling table, stored locally.
     global sample_stats
     global cardinality_stats
+    global rowcount_stats
     sample_stats = []
     cardinality_stats = []
+    rowcount_stats = []
     for i in range(len(tables)):
         # collect stats on each table 
+        rowcount_stats.append(collect_rowcount(conn,tables[i]))
         cardinality_stats.append(collect_cardinality(conn, tables[i]))
         sample_stats.append(collect_sample(conn, tables[i]))
     return
+
+
+def build_random_tree(table_list, result=[]):
+    # recursively split the tree until you're at individual elements
+    # while randomly rearanging the elements in each subtree
+    # at each split re-add the left/right children as a new list to this list
+    local_tables = copy(table_list)
+    # Shuffle so the order is random
+    shuffle(local_tables)
+    if len(local_tables) > 2:
+        # We want at least 1 element in the left tree, at lest one in the right
+        splitter = randint(1,len(local_tables)-1)
+        result.append(build_random_tree(local_tables[0:splitter],result))
+        result.append(build_random_tree(local_tables[splitter:len(local_tables)],result))
+    else:
+        return [local_tables]
+
+
+class Environment():
+    def __init__(self, tables, population):
+        # Encode as id of table in tables list
+        # Separated by join level int.
+        
+        # Encode as random int from 0 to len of table list
+        # create list of ints from 0 - len of table list
+        # random sort, pop repeatedly and append between table ids
+        
+        # One list to hold all individuals in the population.
+        
+        self.herd = []
+        
+        # Create individuals.
+        for individual in range(population):
+            self.herd.append(build_random_tree(tables))
 
 
 def main():
     global env
     global sample_stats
     global cardinality_stats
+    global rowcount_stats
 
     args = parse_args()
     tables = args.tables
@@ -264,12 +332,14 @@ def main():
     if verbose:
         print(tables)
         for i in range(len(tables)):
-            print(f'cardinality of table {tables[i]} is {cardinality_stats[i]}')
+            print(f'rowcount of table {tables[i]} is {rowcount_stats[i]}')
+            print(f'cardinality of table {tables[i]} is {cardinality_stats[i]/rowcount_stats[i]}')
             print(f'sample of table {tables[i]} is {sample_stats[i]}')
 
-    """
-    env = Environment(population)
 
+    env = Environment(tables, population)
+    print(f'herd of {population} individuals is: {env.herd}')
+    """
     f = open('optimizer.log', 'a')
     logger(f, 1)
 
