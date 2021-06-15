@@ -291,6 +291,7 @@ def build_random_tree(table_list):
     shuffle(local_tables)
     print(local_tables)
     if len(local_tables) > 2:
+        # TODO why is this not nesting?
         # We want at least 1 element in the left tree, at lest one in the right
         splitter = randint(1,len(local_tables)-1)
         left = build_random_tree(local_tables[0:splitter])
