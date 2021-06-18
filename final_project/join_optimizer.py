@@ -279,10 +279,8 @@ def analyze_tables(conn, tables):
     return
 
 
-def build_random_tree(table_list):
+def build_random_subtree(table_list):
     global random_tree
-    # TODO this breaks for 3+ trees, find out why.
-
     # recursively split the tree until you're at individual elements
     # while randomly rearanging the elements in each subtree
     # at each split re-add the left/right children as a new list to this list
@@ -290,20 +288,35 @@ def build_random_tree(table_list):
     # Shuffle so the order is random
     shuffle(local_tables)
     print(local_tables)
+    # Could put the recursive end check here.
     if len(local_tables) > 2:
-        # TODO why is this not nesting?
         # We want at least 1 element in the left tree, at lest one in the right
+        # Could return here, check the child sizes before calling self.
         splitter = randint(1,len(local_tables)-1)
-        left = build_random_tree(local_tables[0:splitter])
+        left = build_random_subtree(local_tables[0:splitter])
         if left:
             random_tree.append(left)    
-        right = build_random_tree(local_tables[splitter:len(local_tables)])
+        right = build_random_subtree(local_tables[splitter:len(local_tables)])
         if right:
             random_tree.append(right)
     else:
         print(f'local string to return is {local_tables}')
         return local_tables
+    # If this returns a table here, you get a list nested in itself.
+    # Due to a return when there is an individual table at a join.
+    # Hence the use of the global var
+    # Without this return, only evenly paired tables are returned
+    # I kinda want to use this return for the final return instead of the global var though.
     return
+
+def build_random_tree(table_list):
+    global random_tree
+    # This would be run log_2(n) times for a bushy binary tree.
+    # For left/right deep joins though it could take longer.
+    while len(table_list) > 1:
+        build_random_subtree(table_list)
+        table_list = copy(random_tree)
+    pass
 
 
 class Environment():
