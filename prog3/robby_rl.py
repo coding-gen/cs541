@@ -53,7 +53,7 @@ def parse_args():
     args = parser.parse_args()
     return args
 
-def logger(f, rob, t, action = -1):
+def logger(f, rob, t, choice = -1):
     # Print robby info: location, current reward, maybe percepts
     # Print board info: graphical representation of spaces, cans, and robbie
     # separate with tabs to ensure equal spacing, or set eequal char width setting.
@@ -63,25 +63,19 @@ def logger(f, rob, t, action = -1):
     content = ''
     content += f"Robbie's position: {rob.x}, {rob.y}\n"
     content += f"Robbie's reward: {rob.reward}\n"
-    if action >= 0 and t >= 0:
-        if action == 0: 
-            action = 'Up'
-        elif action == 1:
-            action = 'Down'
-        elif action == 2:
-            action = 'Left'
-        elif action == 3:
-            action = 'Right'
-        elif action == 4:
-            action = 'Pick Up'
-        content += f"For action {t} Robbie took: {action}.\n"
+    actions = ['Up', 'Down', 'Left', 'Right', 'Pick Up']
+    if choice >= 0 and t >= 0:
+        content += f"For trial {t} Robbie took: {actions[choice]}.\n"
     else:
         content += f"Starting State.\n"
 
-    content += '   0  1  2  3  4  5  6  7  8  9\n'
+    header = '   0  1  2  3  4  5  6  7  8  9\n'
+    content += header
     for y in range(len(env.board[0])):
         content += f'{y}: '
         for x in range(len(env.board)-1):
+            if x == rob.x && y == rob.y:
+                content += 
             content += f'{env.board[x][y]}, '
         content += f'{env.board[len(env.board)-1][y]}'
         content += '\n'
@@ -194,33 +188,36 @@ class Robbie():
         # Current, N, S, W, E
         # Values: empty = 0 , can = 1 , wall = -1
         percepts = [0, 0, 0, 0, 0]
-        if env.board[self.x][self.y] == 1:
-            percepts[0] = 1
+
+        #Current
+        percepts[0] = env.board[self.x][self.y]
 
         # North
         if self.y == 0:
             percepts[1] = -1
-        elif env.board[self.x][self.y - 1] == 1:
-            percepts[1] = 1
+        else:
+            percepts[1] = env.board[self.x][self.y - 1]
 
         # South
         if self.y == 9:
             percepts[2] = -1
-        elif env.board[self.x][self.y + 1] == 1:
-            percepts[2] = 1
+        else:
+            percepts[2] = env.board[self.x][self.y + 1]
 
         # West
         if self.x == 0:
             percepts[3] = -1
-        elif env.board[self.x - 1][self.y] == 1:
-            percepts[3] = 1
+        else:
+            percepts[3] = env.board[self.x - 1][self.y]
 
         # East
         if self.x == 9:
             percepts[4] = -1
-        elif env.board[self.x + 1][self.y] == 1:
-            percepts[4] = 1
+        else:
+            percepts[4] = env.board[self.x + 1][self.y]
+
         return percepts
+
 
     def take_action(self, action):
         # Move up, down, left, or right
@@ -284,7 +281,7 @@ class Environment():
             self.board.append(y)
 
 
-def main():
+if __name__ == '__main__':
     global env
     args = parse_args()
     width = int(args.width)
@@ -345,7 +342,3 @@ def main():
         # Avg: sum of rewards per episode, std dev aka test average and test-std-dev
 
     f.close()
-
-if __name__ == '__main__':
-    main()
-
